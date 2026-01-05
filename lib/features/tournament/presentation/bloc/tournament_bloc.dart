@@ -21,12 +21,16 @@ class TournamentBloc extends Bloc<TournamentEvent, TournamentState> {
     Emitter<TournamentState> emit,
   ) {
     emit(TournamentLoading());
-    final matches = generateFixtures.generateRoundRobin(event.teams);
+    final matches = generateFixtures.generateRoundRobin(
+      event.teams,
+      event.maxPoints,
+    );
     final tournament = Tournament(
       id: const Uuid().v4(),
       type: event.type,
       teams: event.teams,
       matches: matches,
+      maxPoints: event.maxPoints,
     );
     emit(TournamentActive(tournament, _calculateStandings(tournament)));
   }
@@ -44,12 +48,22 @@ class TournamentBloc extends Bloc<TournamentEvent, TournamentState> {
       final updatedTournament = currentState.tournament.copyWith(
         matches: updatedMatches,
       );
-      emit(
-        TournamentActive(
-          updatedTournament,
-          _calculateStandings(updatedTournament),
-        ),
-      );
+
+      final standings = _calculateStandings(updatedTournament);
+
+      // Check if all matches finished
+      if (updatedTournament.matches.every((m) => m.isFinished)) {
+        if (updatedTournament.type == TournamentType.roundRobin) {
+          // Find winner
+          final ranked = _getRankedTeams(updatedTournament, standings);
+          if (ranked.isNotEmpty) {
+            emit(TournamentFinished(ranked.first));
+            return; // Exit early as we transitioned state
+          }
+        }
+      }
+
+      emit(TournamentActive(updatedTournament, standings));
     }
   }
 
@@ -71,6 +85,7 @@ class TournamentBloc extends Bloc<TournamentEvent, TournamentState> {
         // 2. Generate Knockout Matches
         final knockoutMatches = generateFixtures.generateKnockoutPhase(
           rankedTeams,
+          currentState.tournament.maxPoints,
         );
 
         if (knockoutMatches.isNotEmpty) {
@@ -94,7 +109,7 @@ class TournamentBloc extends Bloc<TournamentEvent, TournamentState> {
 
     for (var match in tournament.matches) {
       if (match.isFinished && match.winner != null) {
-        standings[match.winner!.id] = (standings[match.winner!.id] ?? 0) + 3;
+        standings[match.winner!.id] = (standings[match.winner!.id] ?? 0) + 1;
       }
     }
     return standings;

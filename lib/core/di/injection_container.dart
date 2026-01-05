@@ -1,12 +1,9 @@
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../../features/player/data/datasources/player_local_data_source.dart';
-import '../../features/player/data/repositories/player_repository_impl.dart';
-import '../../features/player/domain/repositories/player_repository.dart';
+import 'package:shuttle_shuffle/features/player/data/repositories/player_repository_impl.dart';
+import 'package:shuttle_shuffle/features/player/domain/repositories/player_repository.dart';
 import '../../features/player/data/datasources/player_local_data_source.dart';
 import '../../features/player/data/models/player_model.dart';
-import '../../features/player/data/repositories/player_repository_impl.dart';
-import '../../features/player/domain/repositories/player_repository.dart';
 import '../../features/player/domain/usecases/add_player.dart';
 import '../../features/player/domain/usecases/delete_player.dart';
 import '../../features/player/domain/usecases/get_players.dart';
@@ -23,7 +20,8 @@ final sl = GetIt.instance;
 Future<void> init() async {
   // External
   await Hive.initFlutter();
-  
+  sl.registerLazySingleton<HiveInterface>(() => Hive);
+
   // Features - Player Management
   initPlayerFeatures();
   // Features - Team Generation
@@ -63,11 +61,9 @@ void initPlayerFeatures() {
   Hive.registerAdapter(PlayerModelAdapter());
 
   // Bloc
-  sl.registerFactory(() => PlayerBloc(
-        getPlayers: sl(),
-        addPlayer: sl(),
-        deletePlayer: sl(),
-      ));
+  sl.registerFactory(
+    () => PlayerBloc(getPlayers: sl(), addPlayer: sl(), deletePlayer: sl()),
+  );
 
   // Use cases
   sl.registerLazySingleton(() => AddPlayer(sl()));
@@ -83,8 +79,4 @@ void initPlayerFeatures() {
   sl.registerLazySingleton<PlayerLocalDataSource>(
     () => PlayerLocalDataSourceImpl(hive: sl()),
   );
-}
-
-TypeAdapter<dynamic> PlayerModelAdapter() {
-  return PlayerModelAdapter();
 }

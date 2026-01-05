@@ -9,6 +9,7 @@ class Match extends Equatable {
   final int scoreB;
   final bool isFinished;
   final Team? winner;
+  final int maxPoints;
 
   const Match({
     required this.id,
@@ -18,6 +19,7 @@ class Match extends Equatable {
     this.scoreB = 0,
     this.isFinished = false,
     this.winner,
+    this.maxPoints = 21,
   });
 
   Match copyWith({
@@ -28,6 +30,7 @@ class Match extends Equatable {
     int? scoreB,
     bool? isFinished,
     Team? winner,
+    int? maxPoints,
   }) {
     return Match(
       id: id ?? this.id,
@@ -37,9 +40,19 @@ class Match extends Equatable {
       scoreB: scoreB ?? this.scoreB,
       isFinished: isFinished ?? this.isFinished,
       winner: winner ?? this.winner,
+      maxPoints: maxPoints ?? this.maxPoints,
     );
   }
 
   @override
-  List<Object?> get props => [id, teamA, teamB, scoreA, scoreB, isFinished, winner];
+  List<Object?> get props => [
+    id,
+    teamA,
+    teamB,
+    scoreA,
+    scoreB,
+    isFinished,
+    winner,
+    maxPoints,
+  ];
 }

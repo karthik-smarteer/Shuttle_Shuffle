@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Shuttle Shuffle',
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       home: const PlayerInputPage(),
     );

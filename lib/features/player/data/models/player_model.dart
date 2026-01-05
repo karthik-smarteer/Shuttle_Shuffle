@@ -1,6 +1,9 @@
 import 'package:hive/hive.dart';
 import '../../domain/entities/player.dart';
 
+// 1. This must match the filename exactly
+part 'player_model.g.dart';
+
 @HiveType(typeId: 0)
 class PlayerModel extends Player {
   @HiveField(0)

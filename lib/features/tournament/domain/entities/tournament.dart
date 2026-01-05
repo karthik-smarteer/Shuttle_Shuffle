@@ -11,6 +11,7 @@ class Tournament extends Equatable {
   final List<Team> teams;
   final List<match_entity.Match> matches;
   final bool isFinished;
+  final int maxPoints;
 
   const Tournament({
     required this.id,
@@ -18,6 +19,7 @@ class Tournament extends Equatable {
     required this.teams,
     required this.matches,
     this.isFinished = false,
+    this.maxPoints = 21,
   });
 
   Tournament copyWith({
@@ -26,6 +28,7 @@ class Tournament extends Equatable {
     List<Team>? teams,
     List<match_entity.Match>? matches,
     bool? isFinished,
+    int? maxPoints,
   }) {
     return Tournament(
       id: id ?? this.id,
@@ -33,9 +36,10 @@ class Tournament extends Equatable {
       teams: teams ?? this.teams,
       matches: matches ?? this.matches,
       isFinished: isFinished ?? this.isFinished,
+      maxPoints: maxPoints ?? this.maxPoints,
     );
   }
 
   @override
-  List<Object> get props => [id, type, teams, matches, isFinished];
+  List<Object> get props => [id, type, teams, matches, isFinished, maxPoints];
 }

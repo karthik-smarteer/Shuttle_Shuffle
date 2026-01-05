@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shuttle_shuffle/features/match/presentation/pages/scoreboard_page.dart';
+import 'package:shuttle_shuffle/features/team/domain/entities/team.dart';
 import 'package:shuttle_shuffle/features/tournament/domain/entities/tournament.dart';
 import 'package:shuttle_shuffle/features/tournament/presentation/pages/tournament_page.dart';
 import '../../../../core/di/injection_container.dart';
@@ -31,10 +31,7 @@ class TeamDisplayView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Generated Teams'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Generated Teams'), centerTitle: true),
       body: BlocBuilder<TeamBloc, TeamState>(
         builder: (context, state) {
           if (state is TeamLoading) {
@@ -56,7 +53,10 @@ class TeamDisplayView extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: isSolo
-                              ? const BorderSide(color: Colors.orangeAccent, width: 1)
+                              ? const BorderSide(
+                                  color: Colors.orangeAccent,
+                                  width: 1,
+                                )
                               : BorderSide.none,
                         ),
                         child: Padding(
@@ -73,24 +73,31 @@ class TeamDisplayView extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              ...team.players.map((p) => Text(
-                                    p.name,
-                                    style: const TextStyle(
-                                      color: AppColors.text,
-                                      fontSize: 18,
-                                    ),
-                                  )),
+                              ...team.players.map(
+                                (p) => Text(
+                                  p.name,
+                                  style: const TextStyle(
+                                    color: AppColors.text,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
                               if (isSolo) ...[
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    const Icon(Icons.info_outline,
-                                        color: Colors.orangeAccent, size: 16),
+                                    const Icon(
+                                      Icons.info_outline,
+                                      color: Colors.orangeAccent,
+                                      size: 16,
+                                    ),
                                     const SizedBox(width: 6),
                                     Text(
                                       'Needs a substitute/ghost',
                                       style: TextStyle(
-                                        color: Colors.orangeAccent.withOpacity(0.8),
+                                        color: Colors.orangeAccent.withOpacity(
+                                          0.8,
+                                        ),
                                         fontSize: 12,
                                         fontStyle: FontStyle.italic,
                                       ),
@@ -112,23 +119,23 @@ class TeamDisplayView extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
-                             // Re-trigger generation with the same players
-                             // We need to access the players from the event history or pass them down.
-                             // For simplicity accessing via closure if possible or we can store players in state.
-                             // But here we rely on the parent or we can restart the bloc event.
-                             // Better approach: Have a 'ShuffleAgain' event or just pass players again.
-                             // Since we are inside BlocProvider, we can't easily access the initial players without storing them.
-                             // Let's assume we navigate back or use a stored list if we had one.
-                             // Actually, simpler: Just pop and push again or simpler:
-                             // We can't easily re-shuffle here without the player list in the state.
-                             // Let's update state to hold players too? Or just pass it in event.
-                             // For now, let's just use the Navigator to pop.
-                             Navigator.of(context).pop();
+                            // Re-trigger generation with the same players
+                            // We need to access the players from the event history or pass them down.
+                            // For simplicity accessing via closure if possible or we can store players in state.
+                            // But here we rely on the parent or we can restart the bloc event.
+                            // Better approach: Have a 'ShuffleAgain' event or just pass players again.
+                            // Since we are inside BlocProvider, we can't easily access the initial players without storing them.
+                            // Let's assume we navigate back or use a stored list if we had one.
+                            // Actually, simpler: Just pop and push again or simpler:
+                            // We can't easily re-shuffle here without the player list in the state.
+                            // Let's update state to hold players too? Or just pass it in event.
+                            // For now, let's just use the Navigator to pop.
+                            Navigator.of(context).pop();
                           },
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: AppColors.accent),
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                             shape: RoundedRectangleBorder(
+                            shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
@@ -139,18 +146,8 @@ class TeamDisplayView extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            if (state.teams.length >= 2) {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => ScoreboardPage(
-                                    teamA: state.teams.first,
-                                    teamB: state.teams.last,
-                                  ),
-                                ),
-                              );
-                            }
                             if (state.teams.length < 2) {
-                               Fluttertoast.showToast(
+                              Fluttertoast.showToast(
                                 msg: 'Need at least 2 teams!',
                                 toastLength: Toast.LENGTH_SHORT,
                                 gravity: ToastGravity.BOTTOM,
@@ -161,47 +158,7 @@ class TeamDisplayView extends StatelessWidget {
                               return;
                             }
 
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Select Mode'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                      title: const Text('Regular (Round Robin)'),
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => TournamentPage(
-                                              teams: state.teams,
-                                              type: TournamentType.roundRobin,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    ListTile(
-                                      title: const Text('Tournament (Knockout)'),
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => TournamentPage(
-                                              teams: state.teams,
-                                              type: TournamentType.knockout,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
+                            _showConfigDialog(context, state.teams);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.accent,
@@ -211,7 +168,7 @@ class TeamDisplayView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text('Start Match'),
+                          child: const Text('Start Tournament'),
                         ),
                       ),
                     ],
@@ -223,6 +180,107 @@ class TeamDisplayView extends StatelessWidget {
             return Center(child: Text(state.message));
           }
           return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+
+  void _showConfigDialog(BuildContext context, List<Team> teams) {
+    int selectedPoints = 21;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            backgroundColor: AppColors.primaryBackground,
+            title: const Text(
+              'Match Configuration',
+              style: TextStyle(color: AppColors.accent),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Select Target Points:',
+                  style: TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [11, 15, 21].map((p) {
+                    final isSelected = selectedPoints == p;
+                    return ChoiceChip(
+                      label: Text(p.toString()),
+                      selected: isSelected,
+                      selectedColor: AppColors.accent,
+                      labelStyle: TextStyle(
+                        color: isSelected
+                            ? AppColors.primaryBackground
+                            : Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      onSelected: (val) {
+                        if (val) setDialogState(() => selectedPoints = p);
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Select Tournament Mode:',
+                  style: TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 8),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.loop, color: AppColors.accent),
+                  title: const Text(
+                    'Regular (Round Robin)',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TournamentPage(
+                          teams: teams,
+                          type: TournamentType.roundRobin,
+                          maxPoints: selectedPoints,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(
+                    Icons.account_tree,
+                    color: AppColors.accent,
+                  ),
+                  title: const Text(
+                    'Tournament (Knockout)',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TournamentPage(
+                          teams: teams,
+                          type: TournamentType.knockout,
+                          maxPoints: selectedPoints,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
         },
       ),
     );

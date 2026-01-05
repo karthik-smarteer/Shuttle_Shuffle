@@ -13,13 +13,15 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
     on<ScoreTeamA>(_onScoreTeamA);
     on<ScoreTeamB>(_onScoreTeamB);
     on<ResetMatch>(_onResetMatch);
+    on<SkipMatch>(_onSkipMatch);
   }
 
   void _onStartMatch(StartMatch event, Emitter<MatchState> emit) {
     final match = Match(
-      id: const Uuid().v4(),
+      id: event.matchId ?? const Uuid().v4(),
       teamA: event.teamA,
       teamB: event.teamB,
+      maxPoints: event.maxPoints,
     );
     emit(MatchInProgress(match));
   }
@@ -28,7 +30,7 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
     if (state is MatchInProgress) {
       final currentMatch = (state as MatchInProgress).match;
       final updatedMatch = scorer.incrementScoreA(currentMatch);
-      
+
       if (updatedMatch.isFinished) {
         emit(MatchFinished(updatedMatch));
       } else {
@@ -60,11 +62,33 @@ class MatchBloc extends Bloc<MatchEvent, MatchState> {
       }
 
       final resetMatch = Match(
-        id: const Uuid().v4(),
+        id: currentMatch.id,
         teamA: currentMatch.teamA,
         teamB: currentMatch.teamB,
+        maxPoints: currentMatch.maxPoints,
       );
       emit(MatchInProgress(resetMatch));
     }
+  }
+
+  void _onSkipMatch(SkipMatch event, Emitter<MatchState> emit) {
+    Match currentMatch;
+    if (state is MatchInProgress) {
+      currentMatch = (state as MatchInProgress).match;
+    } else if (state is MatchFinished) {
+      currentMatch = (state as MatchFinished).match;
+    } else {
+      return;
+    }
+
+    // Force finish with the selected winner
+    // We can stick with current scores or set specific scores?
+    // Standard skip usually implies a walkover or just accept as is.
+    // Let's keep scores as is but mark winner.
+    final finishedMatch = currentMatch.copyWith(
+      isFinished: true,
+      winner: event.winner,
+    );
+    emit(MatchFinished(finishedMatch));
   }
 }

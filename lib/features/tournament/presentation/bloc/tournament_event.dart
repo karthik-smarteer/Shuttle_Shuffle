@@ -14,11 +14,12 @@ abstract class TournamentEvent extends Equatable {
 class StartTournament extends TournamentEvent {
   final List<Team> teams;
   final TournamentType type;
+  final int maxPoints;
 
-  const StartTournament(this.teams, this.type);
+  const StartTournament(this.teams, this.type, [this.maxPoints = 21]);
 
   @override
-  List<Object> get props => [teams, type];
+  List<Object> get props => [teams, type, maxPoints];
 }
 
 class UpdateMatchResult extends TournamentEvent {
