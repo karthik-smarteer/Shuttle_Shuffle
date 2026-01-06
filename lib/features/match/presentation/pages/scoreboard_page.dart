@@ -78,14 +78,14 @@ class ScoreboardView extends StatelessWidget {
                 ? 'Team Matches Finished! Winner: Team ${winner.players.map((e) => e.name).join(' & ')}'
                 : 'Match Finished!';
 
-            Fluttertoast.showToast(
-              msg: message,
-              toastLength: Toast.LENGTH_LONG,
-              gravity: ToastGravity.CENTER,
-              backgroundColor: AppColors.accent,
-              textColor: AppColors.primaryBackground,
-              fontSize: 18.0,
-            );
+            // Fluttertoast.showToast(
+            //   msg: message,
+            //   toastLength: Toast.LENGTH_LONG,
+            //   gravity: ToastGravity.CENTER,
+            //   backgroundColor: AppColors.accent,
+            //   textColor: AppColors.primaryBackground,
+            //   fontSize: 18.0,
+            // );
           }
         },
         builder: (context, state) {

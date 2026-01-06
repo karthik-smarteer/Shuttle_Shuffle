@@ -28,7 +28,8 @@ class TournamentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<TournamentBloc>()..add(StartTournament(teams, type, maxPoints)),
+      create: (_) =>
+          sl<TournamentBloc>()..add(StartTournament(teams, type, maxPoints)),
       child: const TournamentView(),
     );
   }
