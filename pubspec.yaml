@@ -73,12 +73,17 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/icons/shuttle-shuffle-logo.png"
+
+  # --- Add these for the Black Background on Android ---
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/icons/shuttle-shuffle-logo.png"
+
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
     generate: true
     image_path: "assets/icons/shuttle-shuffle-logo.png"
-    background_color: "#0D0D0D"
-    theme_color: "#0D0D0D"
+    background_color: "#000000"
+    theme_color: "#000000"
   windows:
     generate: true
     image_path: "assets/icons/shuttle-shuffle-logo.png"
